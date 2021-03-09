@@ -45,9 +45,16 @@ function formatData(arrOfObj, refObj, keyToChange, newKey) {
   return newData;
 }
 
-function renameKey(arrofObj, keyToChange, newKey)
-{
+function renameKey(arrofObj, keyToChange, newKey) {
+  const newArr = [];
 
+  arrofObj.forEach((comment) => {
+    const newComment = { ...comment };
+    newComment[newKey] = newComment[keyToChange];
+    delete newComment[keyToChange];
+    newArr.push(newComment);
+  });
+  return newArr;
 }
 
-module.exports = {formatTime, createRef, formatData, renameKey};
+module.exports = { formatTime, createRef, formatData, renameKey };

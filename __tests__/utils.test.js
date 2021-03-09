@@ -2,9 +2,8 @@ const {
   formatTime,
   createRef,
   formatData,
-  renameKey
+  renameKey,
 } = require("../db/utils/data-manipulation");
-
 
 describe("formatTime()", () => {
   it("doesnt mutate the original object", () => {
@@ -199,14 +198,16 @@ describe("formatData()", () => {
     ];
     const refObj = { "Living in the shadow of a great man": 1 };
     const actual = formatData(arrOfObj, refObj, "belongs_to", "article_id");
-    const expected = [{
-      body:
-        "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-      article_id: 1,
-      created_by: "butter_bridge",
-      votes: 16,
-      created_at: 1511354163389,
-    }];
+    const expected = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        article_id: 1,
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+    ];
     expect(actual).toEqual(expected);
   });
   it("returns object with key changed for a many object array", () => {
@@ -215,38 +216,41 @@ describe("formatData()", () => {
         body:
           "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
         belongs_to: "They're not exactly dogs, are they?",
-        created_by: 'butter_bridge',
+        created_by: "butter_bridge",
         votes: 16,
         created_at: 1511354163389,
       },
       {
         body:
-          'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
-        belongs_to: 'Living in the shadow of a great man',
-        created_by: 'butter_bridge',
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        created_by: "butter_bridge",
         votes: 14,
         created_at: 1479818163389,
-      }
+      },
     ];
-    const refObj = { "Living in the shadow of a great man": 1, "They're not exactly dogs, are they?": 2};
+    const refObj = {
+      "Living in the shadow of a great man": 1,
+      "They're not exactly dogs, are they?": 2,
+    };
     const actual = formatData(arrOfObj, refObj, "belongs_to", "article_id");
     const expected = [
       {
         body:
           "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
         article_id: 2,
-        created_by: 'butter_bridge',
+        created_by: "butter_bridge",
         votes: 16,
         created_at: 1511354163389,
       },
       {
         body:
-          'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
         article_id: 1,
-        created_by: 'butter_bridge',
+        created_by: "butter_bridge",
         votes: 14,
         created_at: 1479818163389,
-      }
+      },
     ];
     expect(actual).toEqual(expected);
   });
@@ -256,43 +260,121 @@ describe("formatData()", () => {
         body:
           "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
         belongs_to: "They're not exactly dogs, are they?",
-        created_by: 'butter_bridge',
+        created_by: "butter_bridge",
         votes: 16,
         created_at: 1511354163389,
       },
       {
         body:
-          'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
-        belongs_to: 'Living in the shadow of a great man',
-        created_by: 'butter_bridge',
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        created_by: "butter_bridge",
         votes: 14,
         created_at: 1479818163389,
-      }
+      },
     ];
-    const refObj = { "Living in the shadow of a great man": 1, "They're not exactly dogs, are they?": 2};
+    const refObj = {
+      "Living in the shadow of a great man": 1,
+      "They're not exactly dogs, are they?": 2,
+    };
     formatData(arrOfObj, refObj, "belongs_to", "article_id");
     expect(arrOfObj).toEqual([
       {
         body:
           "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
         belongs_to: "They're not exactly dogs, are they?",
-        created_by: 'butter_bridge',
+        created_by: "butter_bridge",
         votes: 16,
         created_at: 1511354163389,
       },
       {
         body:
-          'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
-        belongs_to: 'Living in the shadow of a great man',
-        created_by: 'butter_bridge',
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        created_by: "butter_bridge",
         votes: 14,
         created_at: 1479818163389,
-      }
+      },
     ]);
   });
 });
-describe("renameKey()", ()=>{
-it('returns empty array when passed empty array', ()=>{
-  expect(renameKey([]).toEqual([]))
-})
-})
+describe("renameKey()", () => {
+  it("returns empty array when passed empty array", () => {
+    expect(renameKey([])).toEqual([]);
+  });
+  it("return an array with multiple objects with changed key", () => {
+    const input = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+      {
+        body:
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        created_by: "butter_bridge",
+        votes: 14,
+        created_at: 1479818163389,
+      },
+    ];
+    const expectedOuput = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        author: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+      {
+        body:
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        author: "butter_bridge",
+        votes: 14,
+        created_at: 1479818163389,
+      },
+    ];
+    expect(renameKey(input, "created_by", "author")).toEqual(expectedOuput);
+  });
+  it("input array is not mutated", () => {
+    const input = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+    ];
+    renameKey(input, "created_by", "author");
+    expect(input).toEqual([
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+    ]);
+  });
+  it("output array has different reference", () => {
+    const input = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389,
+      },
+    ];
+    expect(renameKey(input, "created_by", "author")).not.toBe(input);
+  });
+});

@@ -3,10 +3,14 @@ const {
   articleData,
   commentData,
   userData,
-  renameKey
 } = require("../data/index.js");
 
-const {formatTime, createRef, formatData} = require("../utils/data-manipulation");
+const {
+  formatTime,
+  createRef,
+  formatData,
+  renameKey,
+} = require("../utils/data-manipulation");
 
 exports.seed = function (knex) {
   return knex.migrate
@@ -19,16 +23,25 @@ exports.seed = function (knex) {
       return knex.insert(topicData).into("topics").returning("*");
     })
     .then((addedTopics) => {
-      const formattedArticleData = formatTime(articleData)
+      const formattedArticleData = formatTime(articleData);
       return knex.insert(formattedArticleData).into("articles").returning("*");
     })
-    .then((addedArticles)=>{
-      let commentsWithTimestamp = formatTime(commentData)
-      let refObj = createRef(addedArticles, 'title', 'article_id')
-      let formattedComments = formatData(commentsWithTimestamp, refObj, 'belongs_to', 'article_id')
-      
-      return knex.insert(formattedComments).into('comments')
+    .then((addedArticles) => {
+      let commentsWithTimestamp = formatTime(commentData);
+      let refObj = createRef(addedArticles, "title", "article_id");
+      let formattedComments = formatData(
+        commentsWithTimestamp,
+        refObj,
+        "belongs_to",
+        "article_id"
+      );
+      const finalCommentsFormat = renameKey(
+        formattedComments,
+        "created_by",
+        "author"
+      );
 
-    })
+      return knex.insert(finalCommentsFormat).into("comments");
+    });
   // add seeding functionality here
 };
