@@ -18,9 +18,6 @@ describe("/api", () => {
         .then((response) => {
           const topicsResponse = response.body;
           expect(topicsResponse.topics).toEqual(expect.any(Array));
-          expect(Object.keys(topicsResponse.topics[0])).toEqual(
-            expect.arrayContaining(["description", "slug"])
-          );
           expect(topicsResponse.topics[0]).toMatchObject({
             description: expect.any(String),
             slug: expect.any(String),
@@ -29,8 +26,27 @@ describe("/api", () => {
     });
   });
   describe("users", () => {
-    it("get a user will return a user object", () => {
-      return request(app).get("/api/user/:bob").expect(200);
+    it("get a user will return a user object with correct props", () => {
+      return request(app)
+        .get("/api/user/butter_bridge")
+        .expect(200)
+        .then((response) => {
+          const userResponse = response.body;
+          expect(Array.isArray(userResponse.user)).toBe(true);
+          expect(userResponse.user[0]).toMatchObject({
+            avatar_url: expect.any(String),
+            name: expect.any(String),
+            username: expect.any(String),
+          });
+        });
+    });
+    it("if get request with an unknown username", () => {
+      return request(app).get("/api/user/cheesecake").expect(404);
     });
   });
+  // describe('articles', () => {
+  //   it('get an article will return a article with the correct objec')
+  // })
 });
+
+//user could request non exisitant username
