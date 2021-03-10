@@ -1,5 +1,13 @@
-const getTopics = function (req, res, err) {
-  console.log("here in controller");
-  res.status(200).send("hi");
+const fetchTopics = require("../Models/topicsModel");
+
+const getTopics = function (req, res, next) {
+  fetchTopics()
+    .then((topics) => {
+      res.status(200).send({ topics: topics });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
+
 module.exports = getTopics;
