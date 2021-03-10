@@ -9,7 +9,7 @@ const fetchUser = function (username) {
       if (user.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: "User not found",
+          msg: "Username not found",
         });
       }
       return user;
