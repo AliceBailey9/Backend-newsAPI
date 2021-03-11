@@ -19,10 +19,19 @@ const fetchArticle = function (article_id) {
     });
 };
 
-module.exports = fetchArticle;
-
 //not all articles have comments
 //therefore we want to left join so articles with no comments are not lost
 //going to end up with lots of comment rows for one article - we need to group these together
 //count order? does it need to be in a then block?
 //where- when we dont pass in a param will where be ignored
+
+const updateTheVotes = function (article_id, inc_votes) {
+  return connection
+    .select("*")
+    .from("articles")
+    .where({ "articles.article_id": article_id })
+    .increment({ votes: inc_votes })
+    .returning("*");
+};
+
+module.exports = { fetchArticle, updateTheVotes };
