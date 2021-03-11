@@ -2,18 +2,12 @@ const connection = require("../db/connection");
 
 const fetchArticle = function (article_id) {
   return connection
-    .select(
-      "name AS author",
-      "title",
-      "article_id",
-      "body",
-      "topic",
-      "created_at",
-      "votes"
-    )
+    .select("articles.*")
     .from("articles")
-    .join("users", "articles.author", "=", "users.username")
-    .where({ article_id: article_id })
+    .count({ comment_count: "comment_id" })
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id")
+    .where({ "articles.article_id": article_id })
     .then((article) => {
       if (article.length === 0) {
         return Promise.reject({
@@ -26,3 +20,9 @@ const fetchArticle = function (article_id) {
 };
 
 module.exports = fetchArticle;
+
+//not all articles have comments
+//therefore we want to left join so articles with no comments are not lost
+//going to end up with lots of comment rows for one article - we need to group these together
+//count order? does it need to be in a then block?
+//where- when we dont pass in a param will where be ignored
