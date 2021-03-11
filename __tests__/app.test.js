@@ -102,10 +102,24 @@ describe("/api", () => {
     it("patch request returns 200 status code and updated article", () => {
       return request(app)
         .patch("/api/articles/2")
-        .send({ inc_votes: 1 })
-        .expect(200);
+        .send({ inc_votes: 10 })
+        .expect(200)
+        .then((response) => {
+          expect(response.body.updatedArticle[0].votes).toBe(10);
+        });
+    });
+    it("get 400 when passed an invalid vote", () => {
+      return request(app)
+        .patch("/api/articles/2")
+        .send({ inc_votes: "cheese" })
+        .expect(400);
+    });
+    it("post request returns 201 and responses with posted commed", () => {
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send({ author: "lurker", body: "Would have liked more details" })
+        .expect(201);
     });
   });
 });
-
 //user could request non exisitant username
