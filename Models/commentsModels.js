@@ -4,11 +4,12 @@ const postCommentToArticles = function (commentData) {
   return connection("comments").insert(commentData).returning("*");
 };
 
-const fetchComments = function (article_id) {
+const fetchComments = function (article_id, sorted_by) {
   return connection
     .select("*")
     .from("comments")
-    .where({ article_id: article_id });
+    .where({ article_id: article_id })
+    .orderBy(sorted_by || "created_at", "asc");
 };
 
 module.exports = { postCommentToArticles, fetchComments };

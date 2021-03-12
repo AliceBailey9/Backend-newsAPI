@@ -51,7 +51,7 @@ describe("/api", () => {
     });
   });
   describe("articles", () => {
-    it("get an article will return a article with the correct object", () => {
+    it("get article will return an article with the correct object", () => {
       return request(app)
         .get("/api/articles/2")
         .expect(200)
@@ -70,7 +70,7 @@ describe("/api", () => {
           });
         });
     });
-    it("an article with a comment will feature a comment count", () => {
+    it("get article will feature a comment count", () => {
       return request(app)
         .get("/api/articles/1")
         .expect(200)
@@ -83,7 +83,7 @@ describe("/api", () => {
           );
         });
     });
-    it("get 404 when passed in a number id that doesnt exist", () => {
+    it("get 404 when passed in a article number id that doesnt exist", () => {
       return request(app)
         .get("/api/articles/98")
         .expect(404)
@@ -91,7 +91,7 @@ describe("/api", () => {
           expect(body.msg).toBe("Article not found for article_id: 98");
         });
     });
-    it("get 400 when passed a non numerical id", () => {
+    it("get 400 when passed a non numerical article id", () => {
       return request(app)
         .get("/api/articles/oranges")
         .expect(400)
@@ -105,7 +105,15 @@ describe("/api", () => {
         .send({ inc_votes: 10 })
         .expect(200)
         .then((response) => {
-          expect(response.body.updatedArticle[0].votes).toBe(10);
+          expect(response.body.updatedArticle[0]).toMatchObject({
+            article_id: 2,
+            title: "Sony Vaio; or, The Laptop",
+            body: expect.any(String),
+            votes: 10,
+            topic: "mitch",
+            author: "icellusedkars",
+            created_at: "2014-11-16T12:21:54.171Z",
+          });
         });
     });
     it("get 400 when passed an invalid vote", () => {
@@ -144,11 +152,12 @@ describe("/api", () => {
           );
         });
     });
-    it("get comments by article ID returns correct comment object", () => {
+    it("get comments by article id returns an array including correct comment objects", () => {
       return request(app)
         .get("/api/articles/6/comments")
         .expect(200)
         .then((response) => {
+          expect(Array.isArray(response.body.comments)).toBe(true);
           expect(response.body.comments[0]).toMatchObject({
             comment_id: 16,
             author: "butter_bridge",
@@ -157,6 +166,14 @@ describe("/api", () => {
             created_at: "2002-11-26T12:36:03.389Z",
             body: "This is a bad article name",
           });
+        });
+    });
+    it("get comments by article id returns an empty array when an article has no comments", () => {
+      return request(app)
+        .get("/api/articles/3/comments")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comments).toEqual([]);
         });
     });
 
@@ -170,20 +187,63 @@ describe("/api", () => {
           );
         });
     });
-    // it('get comments by article id is sorted by created_at by default', () => {
-    //   return request(app)
-    //   .get('/api/articles/5')
+    it("get 400 when passed in an invalid article id", () => {
+      return request(app)
+        .get("/api/articles/bluebells/comments")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request; input is not a valid");
+        });
+    });
+    it("get comments by article id is sorted by created_at by default", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comments).toBeSortedBy("created_at");
+        });
+    });
+    it("get comments by article id accepts querys that change sorted order", () => {
+      return request(app)
+        .get("/api/articles/1/comments?sorted_by=votes")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comments).toBeSortedBy("votes");
+        });
+    });
+    it("when get comments by article id is given a sort_by query that is invalid we recieve a 400", () => {
+      return request(app)
+        .get("/api/articles/1/comments?sorted_by=apples")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request; input is not a valid");
+        });
+    });
 
-    // })
+    it("get articles returns array of article objects", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          expect(Array.isArray(response.body.articles)).toBe(true);
+          expect(response.body.articles[2]).toMatchObject({
+            article_id: 10,
+            title: "Seven inspirational thought leaders from Manchester UK",
+            body: "Who are we kidding, there is only one, and it's Mitch!",
+            votes: 0,
+            topic: "mitch",
+            author: "rogersop",
+            created_at: "1982-11-24T12:21:54.171Z",
+          });
+        });
+    });
+    it("get articles is sorted by created_at by default", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toBeSortedBy("created_at");
+        });
+    });
   });
 });
-//user could request non exisitant username
-
-// {
-//   body: 'This is a bad article name',
-//   belongs_to: 'A',
-//   created_by: 'butter_bridge',
-//   votes: 1,
-//   created_at: 1038314163389,
-
-// }

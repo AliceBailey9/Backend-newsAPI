@@ -2,11 +2,18 @@ const {
   fetchArticle,
   updateTheVotes,
   doesArticleExist,
+  fetchAllArticles,
 } = require("../Models/articlesModels");
 const {
   postCommentToArticles,
   fetchComments,
 } = require("../Models/commentsModels");
+
+const getAllArticles = (req, res, next) => {
+  fetchAllArticles().then((articles) => {
+    res.status(200).send({ articles: articles });
+  });
+};
 
 const getArticle = (req, res, next) => {
   const { article_id } = req.params;
@@ -46,7 +53,11 @@ const postComment = (req, res, next) => {
 
 const getComments = (req, res, next) => {
   const { article_id } = req.params;
-  Promise.all([fetchComments(article_id), doesArticleExist(article_id)])
+  const { sorted_by } = req.query;
+  Promise.all([
+    fetchComments(article_id, sorted_by),
+    doesArticleExist(article_id),
+  ])
     .then((comments) => {
       res.status(200).send({ comments: comments[0] });
     })
@@ -55,4 +66,10 @@ const getComments = (req, res, next) => {
     });
 };
 
-module.exports = { getArticle, updateVotes, postComment, getComments };
+module.exports = {
+  getArticle,
+  updateVotes,
+  postComment,
+  getComments,
+  getAllArticles,
+};

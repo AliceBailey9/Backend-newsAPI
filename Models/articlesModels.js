@@ -1,5 +1,9 @@
 const connection = require("../db/connection");
 
+const fetchAllArticles = function () {
+  return connection.select("*").from("articles").orderBy("created_at");
+};
+
 const fetchArticle = function (article_id) {
   return connection
     .select("articles.*")
@@ -18,12 +22,6 @@ const fetchArticle = function (article_id) {
       return article;
     });
 };
-
-//not all articles have comments
-//therefore we want to left join so articles with no comments are not lost
-//going to end up with lots of comment rows for one article - we need to group these together
-//count order? does it need to be in a then block?
-//where- when we dont pass in a param will where be ignored
 
 const updateTheVotes = function (article_id, inc_votes) {
   return connection("articles")
@@ -46,4 +44,9 @@ const doesArticleExist = function (article_id) {
       }
     });
 };
-module.exports = { fetchArticle, updateTheVotes, doesArticleExist };
+module.exports = {
+  fetchArticle,
+  updateTheVotes,
+  doesArticleExist,
+  fetchAllArticles,
+};
