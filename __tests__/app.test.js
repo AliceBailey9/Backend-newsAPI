@@ -227,22 +227,25 @@ describe("/api", () => {
         .then((response) => {
           expect(Array.isArray(response.body.articles)).toBe(true);
           expect(response.body.articles[2]).toMatchObject({
-            article_id: 10,
-            title: "Seven inspirational thought leaders from Manchester UK",
-            body: "Who are we kidding, there is only one, and it's Mitch!",
-            votes: 0,
+            article_id: 3,
+            author: "icellusedkars",
+            body: "some gifs",
+            created_at: "2010-11-17T12:21:54.171Z",
+            title: "Eight pug gifs that remind me of mitch",
             topic: "mitch",
-            author: "rogersop",
-            created_at: "1982-11-24T12:21:54.171Z",
+            votes: 0,
           });
         });
     });
-    it("get all articles is sorted by created_at by default", () => {
+    it("get all articles is sorted by created_at and in descending order by default", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
         .then((response) => {
-          expect(response.body.articles).toBeSortedBy("created_at");
+          console.log(response.body.articles);
+          expect(response.body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
         });
     });
     it("get all articles accepts sort_by query", () => {
@@ -250,20 +253,37 @@ describe("/api", () => {
         .get("/api/articles?sort_by=author")
         .expect(200)
         .then((response) => {
-          expect(response.body.articles).toBeSortedBy("author");
+          expect(response.body.articles).toBeSortedBy("author", {
+            descending: true,
+          });
         });
     });
     it("when passed get all articles an invalid sort_by query, recieve 400", () => {
       return request(app)
-        .get("/api/articles/sort_by=spiders")
+        .get("/api/articles?sort_by=spiders")
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe("Bad request; input is not a valid");
         });
     });
-    // it('get all articles accepts query changing order to ascending', () => {
-    //   return request(app)
-    //   .get('/api/articles?')
-    // })
+    it("get all articles accepts query changing order to ascending", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toBeSortedBy("created_at", {
+            descending: false,
+          });
+        });
+    });
+    it("get all articles accepts an author query, that will filter authors by username", () => {
+      return request(app)
+        .get("/api/articles?author=rogersop")
+        .expect(200)
+        .then((response) => {
+          console.log(response.body.article);
+          expect(response.body.articles.length).toBe(3);
+        });
+    });
   });
 });
