@@ -1,7 +1,7 @@
 const connection = require("../db/connection");
 
 const postCommentToArticles = function (commentData) {
-  return connection("comments").insert(commentData).returning("comments");
+  return connection("comments").insert(commentData).returning("*");
 };
 
 const fetchComments = function (article_id) {

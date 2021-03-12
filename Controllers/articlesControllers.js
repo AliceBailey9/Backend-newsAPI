@@ -35,16 +35,19 @@ const postComment = (req, res, next) => {
   const { article_id } = req.params;
   let commentData = req.body;
   commentData.article_id = article_id;
-  postCommentToArticles(commentData).then((newComment) => {
-    res.status(201).send({ newComment: newComment });
-  });
+  postCommentToArticles(commentData)
+    .then((newComment) => {
+      res.status(201).send({ comment: newComment[0] });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 const getComments = (req, res, next) => {
   const { article_id } = req.params;
   Promise.all([fetchComments(article_id), doesArticleExist(article_id)])
     .then((comments) => {
-      console.log(comments);
       res.status(200).send({ comments: comments[0] });
     })
     .catch((err) => {

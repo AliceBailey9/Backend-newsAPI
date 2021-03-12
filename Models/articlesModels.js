@@ -26,9 +26,7 @@ const fetchArticle = function (article_id) {
 //where- when we dont pass in a param will where be ignored
 
 const updateTheVotes = function (article_id, inc_votes) {
-  return connection
-    .select("*")
-    .from("articles")
+  return connection("articles")
     .where({ article_id: article_id })
     .increment({ votes: inc_votes })
     .returning("*");

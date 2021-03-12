@@ -96,7 +96,7 @@ describe("/api", () => {
         .get("/api/articles/oranges")
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("oranges is not a valid article_id");
+          expect(body.msg).toBe("Bad request; input is not a valid");
         });
     });
     it("patch request returns 200 status code and updated article", () => {
@@ -112,13 +112,37 @@ describe("/api", () => {
       return request(app)
         .patch("/api/articles/2")
         .send({ inc_votes: "cheese" })
-        .expect(400);
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request; input is not a valid");
+        });
     });
-    it("post request returns 201 and responses with posted commed", () => {
+    it("post request returns 201 and responses with posted comment", () => {
       return request(app)
         .post("/api/articles/2/comments")
         .send({ author: "lurker", body: "Would have liked more details" })
-        .expect(201);
+        .expect(201)
+        .then((response) => {
+          expect(response.body.comment).toMatchObject({
+            comment_id: 19,
+            author: "lurker",
+            article_id: 2,
+            votes: 0,
+            created_at: null,
+            body: "Would have liked more details",
+          });
+        });
+    });
+    it("if post request is sent without needed keys (author or body), we receieve a 400", () => {
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send({ author: "lurker" })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Bad request; missing comment content"
+          );
+        });
     });
     it("get comments by article ID returns correct comment object", () => {
       return request(app)
@@ -135,6 +159,7 @@ describe("/api", () => {
           });
         });
     });
+
     it("get 404 when passed in an article id that doesnt exist", () => {
       return request(app)
         .get("/api/articles/66/comments")
@@ -145,6 +170,11 @@ describe("/api", () => {
           );
         });
     });
+    // it('get comments by article id is sorted by created_at by default', () => {
+    //   return request(app)
+    //   .get('/api/articles/5')
+
+    // })
   });
 });
 //user could request non exisitant username
