@@ -10,9 +10,14 @@ const {
 } = require("../Models/commentsModels");
 
 const getAllArticles = (req, res, next) => {
-  fetchAllArticles().then((articles) => {
-    res.status(200).send({ articles: articles });
-  });
+  const { sort_by } = req.query;
+  fetchAllArticles(sort_by)
+    .then((articles) => {
+      res.status(200).send({ articles: articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 const getArticle = (req, res, next) => {

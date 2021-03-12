@@ -220,7 +220,7 @@ describe("/api", () => {
         });
     });
 
-    it("get articles returns array of article objects", () => {
+    it("get all articles returns array of article objects", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -237,7 +237,7 @@ describe("/api", () => {
           });
         });
     });
-    it("get articles is sorted by created_at by default", () => {
+    it("get all articles is sorted by created_at by default", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -245,5 +245,25 @@ describe("/api", () => {
           expect(response.body.articles).toBeSortedBy("created_at");
         });
     });
+    it("get all articles accepts sort_by query", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toBeSortedBy("author");
+        });
+    });
+    it("when passed get all articles an invalid sort_by query, recieve 400", () => {
+      return request(app)
+        .get("/api/articles/sort_by=spiders")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request; input is not a valid");
+        });
+    });
+    // it('get all articles accepts query changing order to ascending', () => {
+    //   return request(app)
+    //   .get('/api/articles?')
+    // })
   });
 });

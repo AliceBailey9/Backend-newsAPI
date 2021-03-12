@@ -1,7 +1,10 @@
 const connection = require("../db/connection");
 
-const fetchAllArticles = function () {
-  return connection.select("*").from("articles").orderBy("created_at");
+const fetchAllArticles = function (sort_by) {
+  return connection
+    .select("*")
+    .from("articles")
+    .orderBy(sort_by || "created_at");
 };
 
 const fetchArticle = function (article_id) {
