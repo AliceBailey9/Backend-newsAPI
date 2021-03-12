@@ -4,4 +4,11 @@ const postCommentToArticles = function (commentData) {
   return connection("comments").insert(commentData).returning("comments");
 };
 
-module.exports = postCommentToArticles;
+const fetchComments = function (article_id) {
+  return connection
+    .select("*")
+    .from("comments")
+    .where({ article_id: article_id });
+};
+
+module.exports = { postCommentToArticles, fetchComments };

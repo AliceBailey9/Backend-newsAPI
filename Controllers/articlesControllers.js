@@ -1,5 +1,12 @@
-const { fetchArticle, updateTheVotes } = require("../Models/articlesModels");
-const postCommentToArticles = require("../Models/commentsModels");
+const {
+  fetchArticle,
+  updateTheVotes,
+  doesArticleExist,
+} = require("../Models/articlesModels");
+const {
+  postCommentToArticles,
+  fetchComments,
+} = require("../Models/commentsModels");
 
 const getArticle = (req, res, next) => {
   const { article_id } = req.params;
@@ -29,9 +36,20 @@ const postComment = (req, res, next) => {
   let commentData = req.body;
   commentData.article_id = article_id;
   postCommentToArticles(commentData).then((newComment) => {
-    console.log(newComment);
     res.status(201).send({ newComment: newComment });
   });
 };
 
-module.exports = { getArticle, updateVotes, postComment };
+const getComments = (req, res, next) => {
+  const { article_id } = req.params;
+  Promise.all([fetchComments(article_id), doesArticleExist(article_id)])
+    .then((comments) => {
+      console.log(comments);
+      res.status(200).send({ comments: comments[0] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports = { getArticle, updateVotes, postComment, getComments };

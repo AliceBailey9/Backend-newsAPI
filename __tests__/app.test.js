@@ -120,6 +120,40 @@ describe("/api", () => {
         .send({ author: "lurker", body: "Would have liked more details" })
         .expect(201);
     });
+    it("get comments by article ID returns correct comment object", () => {
+      return request(app)
+        .get("/api/articles/6/comments")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comments[0]).toMatchObject({
+            comment_id: 16,
+            author: "butter_bridge",
+            article_id: 6,
+            votes: 1,
+            created_at: "2002-11-26T12:36:03.389Z",
+            body: "This is a bad article name",
+          });
+        });
+    });
+    it("get 404 when passed in an article id that doesnt exist", () => {
+      return request(app)
+        .get("/api/articles/66/comments")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Article not found for article_id: 66"
+          );
+        });
+    });
   });
 });
 //user could request non exisitant username
+
+// {
+//   body: 'This is a bad article name',
+//   belongs_to: 'A',
+//   created_by: 'butter_bridge',
+//   votes: 1,
+//   created_at: 1038314163389,
+
+// }
