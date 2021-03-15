@@ -3,7 +3,10 @@ exports.up = function (knex) {
   return knex.schema.createTable("comments", function (commentsTable) {
     commentsTable.increments("comment_id").primary();
     commentsTable.string("author").references("users.username").notNullable();
-    commentsTable.integer("article_id").references("articles.article_id");
+    commentsTable
+      .integer("article_id")
+      .references("articles.article_id")
+      .notNullable();
     commentsTable.integer("votes").defaultTo(0);
     commentsTable.timestamp("created_at");
     commentsTable.text("body").notNullable();

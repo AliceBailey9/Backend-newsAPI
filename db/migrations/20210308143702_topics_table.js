@@ -1,13 +1,12 @@
+exports.up = function (knex) {
+  console.log("creating topics table...");
+  return knex.schema.createTable("topics", function (topicsTable) {
+    topicsTable.string("slug").primary();
+    topicsTable.string("description").notNullable();
+  });
+};
 
-exports.up = function(knex) {
-    console.log('creating topics table...')
-    return knex.schema.createTable('topics', function(topicsTable){
-        topicsTable.string('slug').primary();
-        topicsTable.string('description');
-  })  
-}
-
-exports.down = function(knex) {
-    console.log('removing topics table')
-    return knex.schema.dropTable('topics')
+exports.down = function (knex) {
+  console.log("removing topics table");
+  return knex.schema.dropTable("topics");
 };

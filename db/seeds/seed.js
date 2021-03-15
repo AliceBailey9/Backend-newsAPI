@@ -27,9 +27,9 @@ exports.seed = function (knex) {
       return knex.insert(formattedArticleData).into("articles").returning("*");
     })
     .then((addedArticles) => {
-      let commentsWithTimestamp = formatTime(commentData);
-      let refObj = createRef(addedArticles, "title", "article_id");
-      let formattedComments = formatData(
+      const commentsWithTimestamp = formatTime(commentData);
+      const refObj = createRef(addedArticles, "title", "article_id");
+      const formattedComments = formatData(
         commentsWithTimestamp,
         refObj,
         "belongs_to",
@@ -43,5 +43,4 @@ exports.seed = function (knex) {
 
       return knex.insert(finalCommentsFormat).into("comments");
     });
-  // add seeding functionality here
 };

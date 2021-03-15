@@ -2,9 +2,19 @@ const connection = require("../db/connection");
 
 const fetchAllArticles = function (sort_by, order, author) {
   return connection
-    .select("*")
+    .select(
+      "title",
+      "articles.author",
+      "articles.article_id",
+      "topic",
+      "articles.created_at",
+      "articles.votes"
+    )
     .from("articles")
-    .orderBy(sort_by || "created_at", order || "desc");
+    .count({ comment_count: "comments.comment_id" })
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id")
+    .orderBy(sort_by || "articles.created_at", order || "desc");
 };
 
 const fetchArticle = function (article_id) {
