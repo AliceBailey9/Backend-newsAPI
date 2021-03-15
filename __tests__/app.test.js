@@ -39,7 +39,7 @@ describe("/api", () => {
     });
   });
   describe("users", () => {
-    it("get a user will return a user object with correct props", () => {
+    it("get user by username will return a user object with correct props", () => {
       return request(app)
         .get("/api/user/butter_bridge")
         .expect(200)
@@ -60,6 +60,18 @@ describe("/api", () => {
         .then(({ body }) => {
           expect(body.msg).toBe("Username not found");
         });
+    });
+    it("get 405 status code when wrong method used", () => {
+      const invalidMethods = ["patch", "put", "delete"];
+      const methodPromises = invalidMethods.map((method) => {
+        return request(app)
+          [method]("/api/user")
+          .expect(405)
+          .then((response) => {
+            expect(response.body.msg).toBe("method not allowed");
+          });
+      });
+      return Promise.all(methodPromises);
     });
   });
   describe("articles", () => {
