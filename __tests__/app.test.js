@@ -81,8 +81,7 @@ describe("/api", () => {
         .expect(200)
         .then((response) => {
           const articleResponse = response.body;
-          expect(Array.isArray(articleResponse.article)).toBe(true);
-          expect(articleResponse.article[0]).toMatchObject({
+          expect(articleResponse.article).toMatchObject({
             author: "icellusedkars",
             title: "Sony Vaio; or, The Laptop",
             article_id: 2,
@@ -100,7 +99,7 @@ describe("/api", () => {
         .expect(200)
         .then((response) => {
           const articleResponse = response.body;
-          expect(articleResponse.article[0]).toEqual(
+          expect(articleResponse.article).toEqual(
             expect.objectContaining({
               comment_count: "13",
             })
@@ -129,11 +128,28 @@ describe("/api", () => {
         .send({ inc_votes: 10 })
         .expect(200)
         .then((response) => {
-          expect(response.body.updatedArticle[0]).toMatchObject({
+          expect(response.body.updatedArticle).toMatchObject({
             article_id: 2,
             title: "Sony Vaio; or, The Laptop",
             body: expect.any(String),
             votes: 10,
+            topic: "mitch",
+            author: "icellusedkars",
+            created_at: "2014-11-16T12:21:54.171Z",
+          });
+        });
+    });
+    it("patch request with empty body returns article without any update", () => {
+      return request(app)
+        .patch("/api/articles/2")
+        .send({})
+        .expect(200)
+        .then((response) => {
+          expect(response.body.updatedArticle).toMatchObject({
+            article_id: 2,
+            title: "Sony Vaio; or, The Laptop",
+            body: expect.any(String),
+            votes: 0,
             topic: "mitch",
             author: "icellusedkars",
             created_at: "2014-11-16T12:21:54.171Z",
@@ -174,6 +190,15 @@ describe("/api", () => {
           expect(response.body.msg).toBe(
             "Bad request; missing comment content"
           );
+        });
+    });
+    it("if post request is sent with valid id that doesnt exist we get a 404", () => {
+      return request(app)
+        .post("/api/articles/98/comments")
+        .send({ author: "lurker", body: "love this article, wow" })
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("This id does not exist");
         });
     });
     it("get comments by article id returns an array including correct comment objects", () => {
@@ -219,12 +244,14 @@ describe("/api", () => {
           expect(response.body.msg).toBe("Bad request; input is not a valid");
         });
     });
-    it("get comments by article id is sorted by created_at by default", () => {
+    it("get comments by article id is sorted by created_at by default and descending", () => {
       return request(app)
         .get("/api/articles/1/comments")
         .expect(200)
         .then((response) => {
-          expect(response.body.comments).toBeSortedBy("created_at");
+          expect(response.body.comments).toBeSortedBy("created_at", {
+            descending: true,
+          });
         });
     });
     it("get comments by article id accepts querys that change sorted order", () => {
@@ -232,7 +259,9 @@ describe("/api", () => {
         .get("/api/articles/1/comments?sorted_by=votes")
         .expect(200)
         .then((response) => {
-          expect(response.body.comments).toBeSortedBy("votes");
+          expect(response.body.comments).toBeSortedBy("votes", {
+            descending: true,
+          });
         });
     });
     it("when get comments by article id is given a sort_by query that is invalid we recieve a 400", () => {
@@ -249,7 +278,6 @@ describe("/api", () => {
         .get("/api/articles")
         .expect(200)
         .then((response) => {
-          console.log(response.body.articles);
           expect(Array.isArray(response.body.articles)).toBe(true);
           expect(response.body.articles[2]).toMatchObject({
             article_id: 3,
@@ -270,6 +298,14 @@ describe("/api", () => {
           expect(response.body.articles).toBeSortedBy("created_at", {
             descending: true,
           });
+        });
+    });
+    it("get 405 status code when wrong method used", () => {
+      return request(app)
+        .delete("/api/user")
+        .expect(405)
+        .then((response) => {
+          expect(response.body.msg).toBe("method not allowed");
         });
     });
     it("get all articles accepts sort_by query", () => {

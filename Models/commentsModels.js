@@ -9,7 +9,7 @@ const fetchComments = function (article_id, sorted_by) {
     .select("*")
     .from("comments")
     .where({ article_id: article_id })
-    .orderBy(sorted_by || "created_at", "asc");
+    .orderBy(sorted_by || "created_at", "desc");
 };
 
 module.exports = { postCommentToArticles, fetchComments };
