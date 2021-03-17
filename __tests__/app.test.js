@@ -428,7 +428,33 @@ describe("/api", () => {
       return request(app)
         .patch("/api/comments/200")
         .send({ inc_votes: 10 })
-        .expect(404);
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            `Comment not found for comment_id: 200`
+          );
+        });
+    });
+    it("recieve a 400 when an invalid comment id is given", () => {
+      return request(app)
+        .patch("/api/comments/cheesy")
+        .send({ inc_votes: 2 })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request; input is not valid");
+        });
+    });
+    it("get 405 status code when wrong method used", () => {
+      const invalidMethods = ["get", "put"];
+      const methodPromises = invalidMethods.map((method) => {
+        return request(app)
+          [method]("/api/comments")
+          .expect(405)
+          .then((response) => {
+            expect(response.body.msg).toBe("method not allowed");
+          });
+      });
+      return Promise.all(methodPromises);
     });
   });
   //405 paths!

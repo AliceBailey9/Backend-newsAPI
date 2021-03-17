@@ -19,7 +19,4 @@ const updateCommentVotes = (req, res, next) => {
     });
 };
 
-//if dont add votes number
-//valid id but doesnt exist
-
 module.exports = updateCommentVotes;
