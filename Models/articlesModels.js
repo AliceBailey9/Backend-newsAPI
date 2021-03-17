@@ -1,6 +1,6 @@
 const connection = require("../db/connection");
 
-const fetchAllArticles = function (sort_by, order, author) {
+const fetchAllArticles = function (sort_by, order, author, topic) {
   return connection
     .select(
       "title",
@@ -14,7 +14,17 @@ const fetchAllArticles = function (sort_by, order, author) {
     .count({ comment_count: "comments.comment_id" })
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
-    .orderBy(sort_by || "articles.created_at", order || "desc");
+    .orderBy(sort_by || "articles.created_at", order || "desc")
+    .modify((querySoFar) => {
+      if (author && topic) {
+        querySoFar.where("articles.author", "=", author);
+        querySoFar.where("articles.topic", "=", topic);
+      } else if (author) {
+        querySoFar.where("articles.author", "=", author);
+      } else if (topic) {
+        querySoFar.where("articles.topic", "=", topic);
+      }
+    });
 };
 
 const fetchArticle = function (article_id) {

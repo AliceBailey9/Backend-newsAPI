@@ -13,9 +13,14 @@ const getAllArticles = (req, res, next) => {
   const { sort_by } = req.query;
   const { order } = req.query;
   const { author } = req.query;
-  fetchAllArticles(sort_by, order, author)
+  const { topic } = req.query;
+  fetchAllArticles(sort_by, order, author, topic)
     .then((articles) => {
-      res.status(200).send({ articles: articles });
+      if (articles.length > 1) {
+        res.status(200).send({ articles: articles });
+      } else {
+        res.status(200).send({ articles: articles[0] });
+      }
     })
     .catch((err) => {
       next(err);
@@ -37,9 +42,12 @@ const updateVotes = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
   if (inc_votes) {
-    updateTheVotes(article_id, inc_votes)
+    Promise.all([
+      updateTheVotes(article_id, inc_votes),
+      doesArticleExist(article_id),
+    ])
       .then((article) => {
-        res.status(200).send({ updatedArticle: article[0] });
+        res.status(200).send({ updatedArticle: article[0][0] });
       })
       .catch((err) => {
         next(err);
@@ -57,7 +65,7 @@ const updateVotes = (req, res, next) => {
 
 const postComment = (req, res, next) => {
   const { article_id } = req.params;
-  let commentData = req.body;
+  const commentData = req.body;
   commentData.article_id = article_id;
   postCommentToArticles(commentData)
     .then((newComment) => {

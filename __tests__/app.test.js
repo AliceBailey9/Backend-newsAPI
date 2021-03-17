@@ -119,7 +119,7 @@ describe("/api", () => {
         .get("/api/articles/oranges")
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("Bad request; input is not a valid");
+          expect(body.msg).toBe("Bad request; input is not valid");
         });
     });
     it("patch request returns 200 status code and updated article", () => {
@@ -162,7 +162,18 @@ describe("/api", () => {
         .send({ inc_votes: "cheese" })
         .expect(400)
         .then((response) => {
-          expect(response.body.msg).toBe("Bad request; input is not a valid");
+          expect(response.body.msg).toBe("Bad request; input is not valid");
+        });
+    });
+    it("get 404 when trying to patch an article with a valid id that doesnt exist yet", () => {
+      return request(app)
+        .patch("/api/articles/99")
+        .send({ inc_votes: 70 })
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Article not found for article_id: 99"
+          );
         });
     });
     it("post request returns 201 and responses with posted comment", () => {
@@ -241,7 +252,7 @@ describe("/api", () => {
         .get("/api/articles/bluebells/comments")
         .expect(400)
         .then((response) => {
-          expect(response.body.msg).toBe("Bad request; input is not a valid");
+          expect(response.body.msg).toBe("Bad request; input is not valid");
         });
     });
     it("get comments by article id is sorted by created_at by default and descending", () => {
@@ -269,7 +280,7 @@ describe("/api", () => {
         .get("/api/articles/1/comments?sorted_by=apples")
         .expect(400)
         .then((response) => {
-          expect(response.body.msg).toBe("Bad request; input is not a valid");
+          expect(response.body.msg).toBe("Bad request; input is not valid");
         });
     });
 
@@ -323,7 +334,7 @@ describe("/api", () => {
         .get("/api/articles?sort_by=spiders")
         .expect(400)
         .then((response) => {
-          expect(response.body.msg).toBe("Bad request; input is not a valid");
+          expect(response.body.msg).toBe("Bad request; input is not valid");
         });
     });
     it("get all articles accepts query changing order to ascending", () => {
@@ -336,14 +347,91 @@ describe("/api", () => {
           });
         });
     });
-    // it("get all articles accepts an author query, that will filter authors by username", () => {
-    //   return request(app)
-    //     .get("/api/articles?author=rogersop")
-    //     .expect(200)
-    //     .then((response) => {
-    //       console.log(response.body.article);
-    //       expect(response.body.articles.length).toBe(3);
-    //     });
-    // });
+    it("get all articles accepts an author query, that will filter articles by username", () => {
+      return request(app)
+        .get("/api/articles?author=rogersop")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length).toBe(3);
+        });
+    });
+    it("get all articles accepts a topics query, that will filter articles by topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length).toBe(11);
+        });
+    });
+    it("get all articles accepts mulitple queries a once", () => {
+      return request(app)
+        .get("/api/articles?author=rogersop&topic=cats")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toMatchObject({
+            article_id: 5,
+            author: "rogersop",
+            created_at: expect.any(String),
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            topic: "cats",
+            votes: 0,
+            comment_count: "2",
+          });
+        });
+    });
   });
+  describe("comments", () => {
+    it("patch votes will add votes to comments", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ inc_votes: 70 })
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comment).toMatchObject({
+            comment_id: 2,
+            body:
+              "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+            article_id: 1,
+            author: "butter_bridge",
+            votes: 84,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    it("if patch body is empty return comment without the vote updated", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .expect(200)
+        .send({})
+        .then((response) => {
+          expect(response.body.comment).toMatchObject({
+            comment_id: 2,
+            body:
+              "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+            article_id: 1,
+            author: "butter_bridge",
+            votes: 14,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    it("recieve a 400 when passed an invalid vote body", () => {
+      return request(app)
+        .patch("/api/comments/oranges")
+        .send({ inc_votes: 10 })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request; input is not valid");
+        });
+    });
+    it("recieve a 404 when passed a comment id that does exist yet", () => {
+      return request(app)
+        .patch("/api/comments/200")
+        .send({ inc_votes: 10 })
+        .expect(404);
+    });
+  });
+  //405 paths!
+  //if one query is wrong
+  //if more than one aarticle is sent back its send as an array else just one is send back as an object
 });
