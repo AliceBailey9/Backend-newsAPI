@@ -1,6 +1,7 @@
 const {
   updateTheCommentVotes,
   doesCommentExist,
+  deleteCommentById,
 } = require("../Models/commentsModels");
 
 const updateCommentVotes = (req, res, next) => {
@@ -19,4 +20,19 @@ const updateCommentVotes = (req, res, next) => {
     });
 };
 
-module.exports = updateCommentVotes;
+const deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  Promise.all([deleteCommentById(comment_id), doesCommentExist(comment_id)])
+    .then((response) => {
+      res.status(204).send("hi");
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports = { updateCommentVotes, deleteComment };
+
+//add is author valid
+//add is topic valid
+//delete comment- invalid id, valid id but does not exist

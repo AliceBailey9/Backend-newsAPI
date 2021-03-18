@@ -12,7 +12,7 @@ afterAll(() => connection.destroy());
 
 describe("/api", () => {
   describe("topics", () => {
-    it("get an array of all topics", () => {
+    it(" get all topics returns an array of topics", () => {
       return request(app)
         .get("/api/topics")
         .expect(200)
@@ -25,7 +25,7 @@ describe("/api", () => {
           });
         });
     });
-    it("get 405 status code when wrong method used", () => {
+    it("405 status code when wrong method used", () => {
       const invalidMethods = ["patch", "put", "delete"];
       const methodPromises = invalidMethods.map((method) => {
         return request(app)
@@ -39,7 +39,7 @@ describe("/api", () => {
     });
   });
   describe("users", () => {
-    it("get user by username will return a user object with correct props", () => {
+    it("get user by username will return correct user object", () => {
       return request(app)
         .get("/api/user/butter_bridge")
         .expect(200)
@@ -53,7 +53,7 @@ describe("/api", () => {
           });
         });
     });
-    it("if get request with an unknown username", () => {
+    it("get request with unknown username returns 404", () => {
       return request(app)
         .get("/api/user/cheesecake")
         .expect(404)
@@ -61,7 +61,7 @@ describe("/api", () => {
           expect(body.msg).toBe("Username not found");
         });
     });
-    it("get 405 status code when wrong method used", () => {
+    it("405 status code when wrong method used", () => {
       const invalidMethods = ["patch", "put", "delete"];
       const methodPromises = invalidMethods.map((method) => {
         return request(app)
@@ -75,7 +75,7 @@ describe("/api", () => {
     });
   });
   describe("articles", () => {
-    it("get article will return an article with the correct object", () => {
+    it("get article by article id will return correct article", () => {
       return request(app)
         .get("/api/articles/2")
         .expect(200)
@@ -106,7 +106,7 @@ describe("/api", () => {
           );
         });
     });
-    it("get 404 when passed in a article number id that doesnt exist", () => {
+    it("recieve 404 when passed in a article number id that doesnt exist", () => {
       return request(app)
         .get("/api/articles/98")
         .expect(404)
@@ -114,7 +114,7 @@ describe("/api", () => {
           expect(body.msg).toBe("Article not found for article_id: 98");
         });
     });
-    it("get 400 when passed a non numerical article id", () => {
+    it("recieve 400 when passed a non numerical article id", () => {
       return request(app)
         .get("/api/articles/oranges")
         .expect(400)
@@ -156,7 +156,7 @@ describe("/api", () => {
           });
         });
     });
-    it("get 400 when passed an invalid vote", () => {
+    it("recieve 400 when passed an invalid vote", () => {
       return request(app)
         .patch("/api/articles/2")
         .send({ inc_votes: "cheese" })
@@ -165,7 +165,7 @@ describe("/api", () => {
           expect(response.body.msg).toBe("Bad request; input is not valid");
         });
     });
-    it("get 404 when trying to patch an article with a valid id that doesnt exist yet", () => {
+    it("recieve 404 when trying to patch an article with a valid id that doesnt exist yet", () => {
       return request(app)
         .patch("/api/articles/99")
         .send({ inc_votes: 70 })
@@ -174,6 +174,15 @@ describe("/api", () => {
           expect(response.body.msg).toBe(
             "Article not found for article_id: 99"
           );
+        });
+    });
+    it("recieve 400 when passed an invalid article id", () => {
+      return request(app)
+        .patch("/api/articles/lemon")
+        .send({ inc_votes: 12 })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request; input is not valid");
         });
     });
     it("post request returns 201 and responses with posted comment", () => {
@@ -192,7 +201,7 @@ describe("/api", () => {
           });
         });
     });
-    it("if post request is sent without needed keys (author or body), we receieve a 400", () => {
+    it("if post request is sent without required keys (author or body), we receieve a 400", () => {
       return request(app)
         .post("/api/articles/2/comments")
         .send({ author: "lurker" })
@@ -203,7 +212,7 @@ describe("/api", () => {
           );
         });
     });
-    it("if post request is sent with valid id that doesnt exist we get a 404", () => {
+    it("recieve 404 if post request is sent with valid id that doesnt exist", () => {
       return request(app)
         .post("/api/articles/98/comments")
         .send({ author: "lurker", body: "love this article, wow" })
@@ -212,7 +221,7 @@ describe("/api", () => {
           expect(response.body.msg).toBe("This id does not exist");
         });
     });
-    it("get comments by article id returns an array including correct comment objects", () => {
+    it("get comments by article id returns an array of comments", () => {
       return request(app)
         .get("/api/articles/6/comments")
         .expect(200)
@@ -237,7 +246,7 @@ describe("/api", () => {
         });
     });
 
-    it("get 404 when passed in an article id that doesnt exist", () => {
+    it("recieve 404 when passed in an article id that doesnt exist", () => {
       return request(app)
         .get("/api/articles/66/comments")
         .expect(404)
@@ -247,7 +256,7 @@ describe("/api", () => {
           );
         });
     });
-    it("get 400 when passed in an invalid article id", () => {
+    it("recieve 400 when passed in an invalid article id", () => {
       return request(app)
         .get("/api/articles/bluebells/comments")
         .expect(400)
@@ -355,6 +364,14 @@ describe("/api", () => {
           expect(response.body.articles.length).toBe(3);
         });
     });
+    it("recieve 404 when given an author username that doesn't exist", () => {
+      return request(app)
+        .get("/api/articles?author=bananarama")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("Username not found");
+        });
+    });
     it("get all articles accepts a topics query, that will filter articles by topic", () => {
       return request(app)
         .get("/api/articles?topic=mitch")
@@ -381,7 +398,7 @@ describe("/api", () => {
     });
   });
   describe("comments", () => {
-    it("patch votes will add votes to comments", () => {
+    it("patch votes will increment votes by amount passed in body", () => {
       return request(app)
         .patch("/api/comments/2")
         .send({ inc_votes: 70 })
@@ -398,7 +415,7 @@ describe("/api", () => {
           });
         });
     });
-    it("if patch body is empty return comment without the vote updated", () => {
+    it("if patch body is empty return comment without the votes updated", () => {
       return request(app)
         .patch("/api/comments/2")
         .expect(200)
@@ -417,8 +434,8 @@ describe("/api", () => {
     });
     it("recieve a 400 when passed an invalid vote body", () => {
       return request(app)
-        .patch("/api/comments/oranges")
-        .send({ inc_votes: 10 })
+        .patch("/api/comments/2")
+        .send({ inc_votes: "bananas" })
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe("Bad request; input is not valid");
@@ -456,8 +473,29 @@ describe("/api", () => {
       });
       return Promise.all(methodPromises);
     });
+    it("delete comment by id", () => {
+      return request(app).delete("/api/comments/1").expect(204);
+    });
+    it("recieve 400 when passed an invalid id", () => {
+      return request(app)
+        .delete("/api/comments/dogs")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request; input is not valid");
+        });
+    });
+    it("recieve a 404 when passed an id that doesn't exist yet", () => {
+      return request(app)
+        .delete("/api/comments/392")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            `Comment not found for comment_id: 392`
+          );
+        });
+    });
   });
-  //405 paths!
+
   //if one query is wrong
   //if more than one aarticle is sent back its send as an array else just one is send back as an object
 });

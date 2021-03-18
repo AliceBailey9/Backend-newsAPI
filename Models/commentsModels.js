@@ -40,9 +40,16 @@ const doesCommentExist = function (comment_id) {
     });
 };
 
+const deleteCommentById = function (comment_id) {
+  return connection("comments")
+    .where("comments.comment_id", "=", comment_id)
+    .del();
+};
+
 module.exports = {
   postCommentToArticles,
   fetchComments,
   updateTheCommentVotes,
   doesCommentExist,
+  deleteCommentById,
 };
