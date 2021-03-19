@@ -15,37 +15,18 @@ const getAllArticles = (req, res, next) => {
   const { order } = req.query;
   const { author } = req.query;
   const { topic } = req.query;
-  console.log(author);
 
-  if (author !== undefined) {
-    Promise.all([
-      fetchAllArticles(sort_by, order, author, topic),
-      doesArticleExist(author),
-    ])
-      .then((articles) => {
-        console.log(articles);
-        if (articles.length > 1) {
-          res.status(200).send({ articles: articles[0] });
-        } else {
-          res.status(200).send({ articles: articles[0][0] });
-        }
-      })
-      .catch((err) => {
-        next(err);
-      });
-  } else {
-    fetchAllArticles(sort_by, order, author, topic)
-      .then((articles) => {
-        if (articles.length > 1) {
-          res.status(200).send({ articles: articles });
-        } else {
-          res.status(200).send({ articles: articles[0] });
-        }
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
+  fetchAllArticles(sort_by, order, author, topic)
+    .then((articles) => {
+      if (articles.length > 1) {
+        res.status(200).send({ articles: articles });
+      } else {
+        res.status(200).send({ articles: articles[0] });
+      }
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 const getArticle = (req, res, next) => {
