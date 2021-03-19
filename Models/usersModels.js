@@ -17,6 +17,7 @@ const fetchUser = function (username) {
 };
 
 const doesUsernameExist = function (username) {
+  console.log(username);
   return connection
     .select("*")
     .from("users")

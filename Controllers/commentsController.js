@@ -32,7 +32,3 @@ const deleteComment = (req, res, next) => {
 };
 
 module.exports = { updateCommentVotes, deleteComment };
-
-//add is author valid
-//add is topic valid
-//delete comment- invalid id, valid id but does not exist

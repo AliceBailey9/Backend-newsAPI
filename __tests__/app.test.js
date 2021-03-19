@@ -45,11 +45,10 @@ describe("/api", () => {
         .expect(200)
         .then((response) => {
           const userResponse = response.body;
-          expect(Array.isArray(userResponse.user)).toBe(true);
-          expect(userResponse.user[0]).toMatchObject({
+          expect(userResponse.user).toMatchObject({
             avatar_url: expect.any(String),
-            name: expect.any(String),
-            username: expect.any(String),
+            name: "jonny",
+            username: "butter_bridge",
           });
         });
     });
@@ -196,7 +195,7 @@ describe("/api", () => {
             author: "lurker",
             article_id: 2,
             votes: 0,
-            created_at: null,
+            created_at: expect.any(String),
             body: "Would have liked more details",
           });
         });
