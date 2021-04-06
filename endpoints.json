@@ -9,7 +9,7 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
-  "GET /api/users/:username": {
+  "GET /api/user/:username": {
     "description": "serves a username object",
     "queries": [],
     "exampleResponse": {
@@ -21,7 +21,7 @@
     },
     "GET /api/articles": {
       "description": "serves an array of all articles",
-      "queries": ["author", "topic", "sort_by", "order"],
+      "queries": ["author", "topic", "created_at", "order"],
       "exampleResponse": {
         "articles": [
           {
@@ -89,7 +89,7 @@
     },
     "GET /api/articles/:article_id/comments": {
       "description": "serves an array of comments attached to an article",
-      "queries": ["sort_by", "order"],
+      "queries": ["created_at", "order"],
       "exampleResponse": {
         "comments": [
           {
