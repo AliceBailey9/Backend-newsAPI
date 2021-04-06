@@ -6,9 +6,9 @@ const {
   psqlErrors,
 } = require("./Errors/index");
 const cors = require("cors");
+const app = express();
 
 app.use(cors());
-const app = express();
 
 app.use(express.json());
 
