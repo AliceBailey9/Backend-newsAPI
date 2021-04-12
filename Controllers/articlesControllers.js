@@ -69,13 +69,18 @@ const postComment = (req, res, next) => {
   const { article_id } = req.params;
   const commentData = req.body;
   commentData.article_id = article_id;
-  postCommentToArticles(commentData)
-    .then((newComment) => {
-      res.status(201).send({ comment: newComment[0] });
-    })
-    .catch((err) => {
-      next(err);
-    });
+  if (commentData.body === "") {
+    const err = { status: 400, msg: "Bad request; missing comment content" };
+    next(err);
+  } else {
+    postCommentToArticles(commentData)
+      .then((newComment) => {
+        res.status(201).send({ comment: newComment[0] });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
 };
 
 const getComments = (req, res, next) => {

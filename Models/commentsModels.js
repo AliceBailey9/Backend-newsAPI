@@ -1,18 +1,7 @@
 const connection = require("../db/connection");
 
 const postCommentToArticles = function (commentData) {
-  return connection("comments")
-    .insert(commentData)
-    .returning("*")
-    .then((commentData) => {
-      if (commentData[0].body === "") {
-        return Promise.reject({
-          status: 400,
-          msg: "Bad request; missing comment content",
-        });
-      }
-      return commentData;
-    });
+  return connection("comments").insert(commentData).returning("*");
 };
 
 const fetchComments = function (article_id, sorted_by) {
