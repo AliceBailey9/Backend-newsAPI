@@ -127,14 +127,14 @@ describe("/api", () => {
     it("patch request returns 200 status code and updated article", () => {
       return request(app)
         .patch("/api/articles/2")
-        .send({ inc_votes: 10 })
+        .send({ inc_votes: -10 })
         .expect(200)
         .then((response) => {
           expect(response.body.updatedArticle).toMatchObject({
             article_id: 2,
             title: "Sony Vaio; or, The Laptop",
             body: expect.any(String),
-            votes: 10,
+            votes: -10,
             topic: "mitch",
             author: "icellusedkars",
             created_at: "2014-11-16T12:21:54.171Z",
@@ -207,6 +207,17 @@ describe("/api", () => {
       return request(app)
         .post("/api/articles/2/comments")
         .send({ author: "lurker" })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Bad request; missing comment content"
+          );
+        });
+    });
+    it("if post request is sent without any text in the body, we receieve a 400", () => {
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send({ author: "lurker", body: "" })
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe(
@@ -330,12 +341,22 @@ describe("/api", () => {
           expect(response.body.msg).toBe("method not allowed");
         });
     });
-    it("get all articles accepts sort_by query", () => {
+    it("get all articles accepts sort_by query using author", () => {
       return request(app)
         .get("/api/articles?sort_by=author")
         .expect(200)
         .then((response) => {
           expect(response.body.articles).toBeSortedBy("author", {
+            descending: true,
+          });
+        });
+    });
+    it("get all articles accepts sort_by query using votes", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toBeSortedBy("votes", {
             descending: true,
           });
         });
